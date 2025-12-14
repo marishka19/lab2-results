@@ -1,0 +1,32 @@
+From 266db966101bdce2e02767988293b8224e369b28 Mon Sep 17 00:00:00 2001
+From: Marina Vinokurova <Marinka47912@mail.ru>
+Date: Sun, 14 Dec 2025 15:10:03 +0300
+Subject: [PATCH] Fix CVE-2014-8130: Prevent division by zero in
+ TIFFSetupStrips
+
+---
+ libtiff/tif_write.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libtiff/tif_write.c b/libtiff/tif_write.c
+index e31476d..b02a91b 100644
+--- a/libtiff/tif_write.c
++++ b/libtiff/tif_write.c
+@@ -483,10 +483,10 @@ TIFFSetupStrips(TIFF* tif)
+ 	td->td_nstrips = td->td_stripsperimage;
+ 	if (td->td_planarconfig == PLANARCONFIG_SEPARATE)
+             if (td->td_stripsperimage == 0) {
+-             TIFFErrorExt(tif->tif_clientdata, module, "Zero strips per image");
+-             return (0);
+-        }
+-		td->td_stripsperimage /= td->td_samplesperpixel;
++                TIFFErrorExt(tif->tif_clientdata, "TIFFSetupStrips", "Zero strips per image");
++                return (0);
++            }
++	    td->td_stripsperimage /= td->td_samplesperpixel;
+ 	td->td_stripoffset = (uint64 *)
+ 	    _TIFFmalloc(td->td_nstrips * sizeof (uint64));
+ 	td->td_stripbytecount = (uint64 *)
+-- 
+2.39.5 (Apple Git-154)
+
